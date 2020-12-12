@@ -70,6 +70,18 @@ struct Airport *findAirportByIATA(struct AirportManager *manager, char *IATA){
     return NULL; // if there is not airport's code with the same IATA code that given
 }
 
+/**
+ * This method get flight, takeoff code, landing code and verifies that takeoff and landing code's flight
+ * are match to codes that given
+ * @param flight that given for check
+ * @param takeoffIATA code for verified with takeoff code's flight
+ * @param landingIATA code for verified with landing code's flight
+ * @return 1 - if codes are match,
+ *         0 - otherwise
+ */
 int checkReceiveFlightDestination(struct Flight *flight, char *takeoffIATA, char *landingIATA){
-
+    if(strcmp((const char *) flight->takeoffAirport, takeoffIATA) == 0
+    && strcmp((const char *) flight->landingAirport, landingIATA) == 0)
+        return 1;
+    return 0;
 }
