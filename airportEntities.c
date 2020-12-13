@@ -80,8 +80,49 @@ struct Airport *findAirportByIATA(struct AirportManager *manager, char *IATA){
  *         0 - otherwise
  */
 int checkReceiveFlightDestination(struct Flight *flight, char *takeoffIATA, char *landingIATA){
-    if(strcmp((const char *) flight->takeoffAirport, takeoffIATA) == 0
-    && strcmp((const char *) flight->landingAirport, landingIATA) == 0)
+    if(strcmp((const char *) flight->IATATakeoff, takeoffIATA) == 0
+    && strcmp((const char *) flight->IATALanding, landingIATA) == 0)
         return 1;
     return 0;
+}
+
+int checkFlightsLineCount(struct Airline *airline, char *takeoffIATA, char *landingIATA){
+    //TODO ask !!!!
+    int i;
+    int flightsCounter = 0;
+    for(i = 0; i < airline->flightsCounter; i++){
+        if(checkReceiveFlightDestination(&airline->airlineFlights[i], takeoffIATA, landingIATA) == 1)
+            flightsCounter++;
+    }
+    return flightsCounter;
+}
+
+/**
+ * * This method add flight to airline
+ * @param airline that flight will be added
+ * @param flight that added to airline
+ */
+void addFlight(struct Airline *airline, struct Flight flight){
+    //TODO should init size and airports
+    airline->airlineFlights = realloc(airline->airlineFlights, (airline->flightsCounter + 1) * sizeof(struct Flight));
+
+
+    if(airline->airlineFlights == NULL){
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+
+    airline->airlineFlights[airline->flightsCounter] = flight;
+    airline->flightsCounter += 1;
+}
+
+/**
+ * This method print a count of airline's flights
+ * @param airline that checked on
+ * @param takeoffIATA code for check
+ * @param landingIATA code for check
+ */
+void printAirlineFlightsLine(struct Airline *airline, char *takeoffIATA, char *landingIATA){
+    int flightsCounter = airline->airlineFlights->checkFlightsLineCount(airline->airlineFlights,takeoffIATA,landingIATA);
+    printf("This Airline Have %d flights in this line", flightsCounter);
 }

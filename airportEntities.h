@@ -39,8 +39,8 @@ struct Date{
 };
 
 struct Flight{
-    struct Airport *takeoffAirport;
-    struct Airport *landingAirport;
+    char *IATATakeoff;
+    char *IATALanding;
     int takeoffTime;
     struct Date *date;
 
@@ -58,7 +58,7 @@ struct Airline{
     struct Flight *airlineFlights;
 
 
-    void (*addFlight)(struct Flight *airLineFlights, struct Flight *flight);
+    void (*addFlight)(struct Flight *airLineFlights, struct Flight flight);
     void (*printAirlineFlightsLine)(char *takeoffIATA, char *landingIATA);
 
     void (*userInput)();
