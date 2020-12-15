@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "airportEntities.h"
 
 /**
@@ -125,4 +126,104 @@ void addFlight(struct Airline *airline, struct Flight flight){
 void printAirlineFlightsLine(struct Airline *airline, char *takeoffIATA, char *landingIATA){
     int flightsCounter = airline->airlineFlights->checkFlightsLineCount(airline->airlineFlights,takeoffIATA,landingIATA);
     printf("This Airline Have %d flights in this line", flightsCounter);
+}
+
+/**
+ * This method correct airport name by the condition of the exercise
+ * @param airportName that given to method
+ * @return new airport name by the condition of the exercise
+ */
+ // TODO - 1. First letter MUST be uppercase. if there are more then 1 word - last letter's word lowercase
+ //        2. Between 2 words must be double 'space'
+ //        3. There are must NOT be a 'space' in first letter and last
+ //        4. if word's len is even - first letter uppercase, second letter lowercase and etc...
+char *fixAirportName(char *airportName){
+     char* space = " ";
+     char *token = NULL;
+     char correctedAirportName[STRING_MAX_SIZE];
+     int currentIndex = 0;
+
+     token = strtok(airportName,space);
+     if(token == NULL){
+         perror("No command given ...");
+         return NULL;
+     }
+     do{
+         if(strlen(token) > 0){
+             if(strlen(token) % 2 == 0){
+                 int i;
+                 for(i = 0; i < strlen(token); i++){
+                     if(i % 2 == 0){
+                         correctedAirportName[currentIndex] = toupper(token[i]);
+                     }else{
+                         correctedAirportName[currentIndex] = tolower(token[i]);
+                     }
+                     currentIndex++;
+                 }
+                 correctedAirportName[currentIndex] = ' ';
+                 currentIndex++;
+                 correctedAirportName[currentIndex] = ' ';
+                 currentIndex++;
+             }
+         }
+     } while (token = strtok(NULL, space) != NULL);
+}
+
+/**
+ * This method get input by user for airport name
+ */
+void inputAirportName(){
+    char airportName[STRING_MAX_SIZE];
+    printf("Please Enter Airport name: ");
+    gets(airportName);
+    fixAirportName(airportName);
+}
+
+/**
+ * This method check if the date is valid
+ * @param dd int day that given
+ * @param mm int month that given
+ * @param yyyy int year that given
+ * @return 1 - if date is valid, otherwise 0 - (invalid date)
+ */
+int checkDate(int dd,int mm,int yyyy){
+
+    //check year
+    if(yyyy>=1900 && yyyy <= 9999){
+        //check month
+        if(mm>=1 && mm<=12){
+            //check day
+            if((dd>=1 && dd<=31) && (mm == 1 || mm == 3 || mm == 5 || mm == 7 || mm ==8))
+                return 0;
+            else if((dd>=1 && dd<=30) && (mm == 4 || mm == 6 || mm == 9 || mm == 11))
+                return  0;
+            else if((dd>=1 && dd<=28) && (mm == 2))
+                return 0;
+        } else
+            return 0; // Month in valid
+    }else
+        return 0; // Year invalid
+    return 1; // Date valid
+}
+/**
+ * This method get departure date from user
+ * @param date that given by user
+ */
+ // TODO - 1. get first string from user
+ //        2. do on it strtok with delimiter '/'
+ //        3. check if I get 3 tokes in format "dd/mm/yyyy"
+void getDepartureDateFromUser(struct Date *date){
+
+    printf("Please Enter Departure Date (format - DD/MM/YYYY) : ");
+    int dd = -1,mm = -1,yyyy = -1;
+
+    scanf("%d/%d/%d",&dd,&mm,&yyyy);
+
+    if(dd == -1 || mm == -1 || yyyy == -1){
+        printf("Invalid date\n");
+    }
+     if(date->checkDate(dd,mm,yyyy) == 0){
+         printf("Invalid date\n");
+         getDepartureDateFromUser(date);
+     }
 }

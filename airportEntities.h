@@ -4,6 +4,7 @@
 
 #ifndef EXERCISE2_AIRPORTENTITIES_H
 #define EXERCISE2_AIRPORTENTITIES_H
+#define STRING_MAX_SIZE 255
 
 struct Airport {
     char *airportName;
@@ -13,19 +14,19 @@ struct Airport {
     int (*airportIdentical)(struct Airport *airport1, struct Airport *airport2);
     int (*IATAIdentical)(struct Airport *airport, char *IATA);
 
-    void (*userInput)();
-    void (*printAirport)();
-    void (*freeAirport)();
+    void (*inputAirportName)();
+    void (*printAirport)(struct Airport *airport);
+    void (*freeAirport)(struct Airport *airport);
 };
 
 struct AirportManager {
+    char *airportManagerName;
     struct Airport *airports;
     int airportsSize;
 
     void (*addAirport)(struct AirportManager *manager, struct Airport airport);
     struct Airport *(*findAirportByIATA)(struct AirportManager *manager, char *IATA);
 
-    void (*userInput)();
     void (*printAirportManager)();
     void (*freeAirportManager)();
 };
@@ -35,7 +36,8 @@ struct Date{
     int month;
     int year;
 
-    int (*checkDate)(struct Date *date);
+    int (*checkDate)(int dd, int mm, int yyyy);
+    void (*getDepartureDateFromUser)(struct Date *date);
 };
 
 struct Flight{
