@@ -42,16 +42,25 @@ int IATAIdentical(struct Airport *airport, const char *IATA){
  * @param airportSize size of airports array
  * @param airport to be added
  */
-void addAirport(struct AirportManager *manager, struct Airport airport){
-    //TODO should init size and airports
-    manager->airports = realloc(manager->airports, (manager->airportsSize + 1) * sizeof(airport));
+void addAirport(struct AirportManager *manager){
+    char airportName[STRING_MAX_SIZE],airportCountry[STRING_MAX_SIZE],IATA[3];
 
+    userInput(manager->airports, manager->airportsSize,airportName,airportCountry,IATA);
+
+    if(manager->airportsSize == 0){
+        manager->airports = (struct Airport *) malloc(sizeof (struct Airport));
+    } else {
+        manager->airports = realloc(manager->airports, (manager->airportsSize + 1) * sizeof(struct Airport));
+    }
     if(manager->airports == NULL){
         printf("Memory allocation failed\n");
         exit(1);
     }
 
-    manager->airports[manager->airportsSize] = airport;
+    manager->airports[manager->airportsSize].airportName = airportName;
+    manager->airports[manager->airportsSize].countryName = airportCountry;
+    manager->airports[manager->airportsSize].IATA = IATA;
+
     manager->airportsSize += 1;
 }
 
@@ -89,6 +98,7 @@ int checkReceiveFlightDestination(struct Flight *flight, char *takeoffIATA, char
 
 int checkFlightsLineCount(struct Airline *airline, char *takeoffIATA, char *landingIATA){
     //TODO ask !!!!
+    //TODO shani changed the signature to struct Airline *airline, and not flights !
     int i;
     int flightsCounter = 0;
     for(i = 0; i < airline->flightsCounter; i++){
@@ -103,17 +113,27 @@ int checkFlightsLineCount(struct Airline *airline, char *takeoffIATA, char *land
  * @param airline that flight will be added
  * @param flight that added to airline
  */
-void addFlight(struct Airline *airline, struct Flight flight){
-    //TODO should init size and airports
-    airline->airlineFlights = realloc(airline->airlineFlights, (airline->flightsCounter + 1) * sizeof(struct Flight));
-
-
+void addFlight(struct Airline *airline){
+    char IATATakeoff[3],IATALanding[3];
+    if(airline->flightsCounter == 0){
+        airline->airlineFlights = malloc(sizeof(struct Flight));
+    } else {
+        airline->airlineFlights = realloc(airline->airlineFlights, (airline->flightsCounter + 1) * sizeof(struct Flight));
+    }
     if(airline->airlineFlights == NULL){
         printf("Memory allocation failed\n");
         exit(1);
     }
 
-    airline->airlineFlights[airline->flightsCounter] = flight;
+    printf("Please Enter IATA source code: ");
+    scanf("%s\n",IATATakeoff);
+    printf("\nPlease Enter IATA destination code: ");
+    scanf("%s\n",IATALanding);
+
+    airline->airlineFlights[airline->flightsCounter].IATATakeoff = IATATakeoff;
+    airline->airlineFlights[airline->flightsCounter].IATALanding = IATALanding;
+    getDepartureDateFromUser(airline->airlineFlights[airline->flightsCounter].date);
+
     airline->flightsCounter += 1;
 }
 
@@ -123,9 +143,16 @@ void addFlight(struct Airline *airline, struct Flight flight){
  * @param takeoffIATA code for check
  * @param landingIATA code for check
  */
-void printAirlineFlightsLine(struct Airline *airline, char *takeoffIATA, char *landingIATA){
-    int flightsCounter = airline->airlineFlights->checkFlightsLineCount(airline->airlineFlights,takeoffIATA,landingIATA);
-    printf("This Airline Have %d flights in this line", flightsCounter);
+void printAirlineFlightsLine(struct Airline *airline){
+    char takeoffIATA[3], landingIATA[3];
+
+    printf("Please Enter IATA Source Code: ");
+    scanf("%s\n",takeoffIATA);
+    printf("\nPlease Enter IATA Destination Code: ");
+    scanf("%s\n",landingIATA);
+
+    int flightsCounter = checkFlightsLineCount(airline->airlineFlights,takeoffIATA,landingIATA);
+    printf("\nThis Airline Have %d flights in this line", flightsCounter);
 }
 
 /**
@@ -172,11 +199,34 @@ char *fixAirportName(char *airportName){
 /**
  * This method get input by user for airport name
  */
-void inputAirportName(){
-    char airportName[STRING_MAX_SIZE];
+void inputAirportName(char * airportName){
     printf("Please Enter Airport name: ");
-    gets(airportName);
+    scanf("%s\n",airportName);
     fixAirportName(airportName);
+}
+
+void inputAirportCountry(char *countryName){
+    printf("Please Enter Airport country: ");
+    scanf("%s\n",countryName); //TODO need to verify ?
+}
+
+void inputAirportIATA(struct Airport *airports, int airportsSize, char *IATA){
+    printf("Please Enter Airport IATA: ");
+    scanf("%s\n",IATA);
+    for(int i=0; i< airportsSize; i++){
+        if(IATAIdentical(&airports[i],IATA)){
+            printf("IATA already exist, please try again");
+            break;
+        } else {
+            inputAirportIATA(airports,airportsSize, IATA);
+        }
+    }
+}
+
+void userInput(struct Airport *airports, int airportsSize, char *airportName, char *countryName, char *IATA){
+    inputAirportName(airportName);
+    inputAirportCountry(countryName);
+    inputAirportIATA(airports,airportsSize,IATA);
 }
 
 /**
@@ -218,12 +268,31 @@ void getDepartureDateFromUser(struct Date *date){
     int dd = -1,mm = -1,yyyy = -1;
 
     scanf("%d/%d/%d",&dd,&mm,&yyyy);
-
     if(dd == -1 || mm == -1 || yyyy == -1){
         printf("Invalid date\n");
     }
-     if(date->checkDate(dd,mm,yyyy) == 0){
+     if(checkDate(dd,mm,yyyy) == 0){
          printf("Invalid date\n");
          getDepartureDateFromUser(date);
      }
 }
+
+void airlineUserInput(char *airlineName){
+    printf("Please Enter Airline Name: ");
+    scanf("%s\n",airlineName);
+}
+
+void freeAirline(struct Airline* airline) {
+    free(airline->airlineFlights);
+    free(airline);
+}
+
+void freeAirportManager(struct AirportManager *manager){
+    free(manager->airports);
+    free(manager);
+}
+
+void printAirline(){};
+void printAirportManager(){};
+
+
