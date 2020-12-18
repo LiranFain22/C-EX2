@@ -14,12 +14,12 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
            "E - exit program\n");
 
     char userInput;
-    scanf("%c",&userInput);
+    gets(&userInput);
 
     // TODO - continue here
     switch (userInput) {
         case 'A':{
-            addFlight(airline);
+            addFlight(airportManager,airline);
             break;
         }
         case 'B':{
@@ -27,11 +27,11 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
             break;
         }
         case 'C':{
-            printAirline();//TODO lemashmesh !!
+            printAirline(airline);//TODO lemashmesh !!
             break;
         }
         case 'D':{
-            printAirportManager();//TODO lemashmesh
+            printAirportManager(airportManager);//TODO lemashmesh
             break;
         }
         case 'G':{
@@ -39,10 +39,10 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
             break;
         }
         case 'E':{
-            return 1;
+            return 0;
         }
     }
-    return 0;
+    return 1;
 }
 
 int main() {
@@ -58,8 +58,11 @@ int main() {
         return 1;
     }
 
+    airportManager->airportsSize = 0;
     printf("Please Enter Number of Airports:");
-    scanf("%d",&airportsSize);
+    char size[STRING_MAX_SIZE];
+    gets(size);
+    airportsSize = strtol(size,NULL,10);
     printf("\n\n");
 
     for (i = 0; i < airportsSize; ++i) {
@@ -73,6 +76,7 @@ int main() {
     }
 
     airlineUserInput(airLineName);
+    airline->companyName = airLineName;
     airline->flightsCounter = 0;
     int userContinue = menu(airportManager, airline);
 
