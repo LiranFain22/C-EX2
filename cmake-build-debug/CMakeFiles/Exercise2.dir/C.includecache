@@ -6,18 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/cygdrive/c/Users/Liran/CLionProjects/Exercise2/airportEntities.c
-stdlib.h
--
-stdio.h
--
-string.h
--
-ctype.h
--
-airportEntities.h
-/cygdrive/c/Users/Liran/CLionProjects/Exercise2/airportEntities.h
-
 /cygdrive/c/Users/Liran/CLionProjects/Exercise2/airportEntities.h
 
 /cygdrive/c/Users/Liran/CLionProjects/Exercise2/main.c

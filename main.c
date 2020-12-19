@@ -17,9 +17,9 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
     char userInput;
     gets(input);
     if(strlen(input) > 1){
-        //not good TODO
+        printf("Invalid input, please try again\n\n");
+        menu(airportManager, airline);
     }
-
     userInput = input[0];
     switch (userInput) {
         case 'A':{
@@ -42,11 +42,14 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
             printAirlineFlightsLine(airline);
             break;
         }
-        default:{ //case E
+        case 'E':{
             printf("Program ending..\n");
             return 0;
         }
-
+        default:{
+            printf("Invalid character, please try again\n\n");
+            menu(airportManager, airline);
+        }
     }
     return 1;
 }
