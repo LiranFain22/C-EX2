@@ -1,12 +1,12 @@
-//
-// Created by Liran on 12/12/2020.
-//
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "airportEntities.h"
+
+int IATAValid(struct AirportManager *manager, char *iata);
+int upperFirstLetter(const char *token, char *correctedAirportName, int currentIndex);
+int lowerFirstLetter(const char *token, char *correctedAirportName, int currentIndex);
 
 /**
  * This method get 2 airports and return:
@@ -97,10 +97,7 @@ struct Airport *findAirportByIATA(struct AirportManager *manager, char *IATA){
     return NULL; // if there is not airport's code with the same IATA code that given
 }
 
-int IATAValid(struct AirportManager *manager, char *iata);
 
-int upperFirstLetter(const char *token, char *correctedAirportName, int currentIndex);
-int lowerFirstLetter(const char *token, char *correctedAirportName, int currentIndex);
 
 /**
  * This method get flight, takeoff code, landing code and verifies that takeoff and landing code's flight
@@ -118,6 +115,14 @@ int checkReceiveFlightDestination(struct Flight *flight, char *takeoffIATA, char
     return 0;
 }
 
+/**
+ * This method get airline, IATA source code and IATA destination code and return number of flights that
+ * airline have in this destinations.
+ * @param airline that checked on
+ * @param takeoffIATA IATA source code that given
+ * @param landingIATA IATA destination code that given
+ * @return number of flights
+ */
 int checkFlightsLineCount(struct Airline *airline, char *takeoffIATA, char *landingIATA){
     int i;
     int flightsCounter = 0;
@@ -217,10 +222,6 @@ void printAirlineFlightsLine(struct Airline *airline){
  * @param airportName that given to method
  * @return new airport name by the condition of the exercise
  */
- // TODO - 1. First letter MUST be uppercase. if there are more then 1 word - last letter's word lowercase
- //        2. Between 2 words must be double 'space'
- //        3. There are must NOT be a 'space' in first letter and last
- //        4. if word's len is even - first letter uppercase, second letter lowercase and etc...
 int fixAirportName(char *airportName) {
      char *space = " ";
      char *token = NULL;
@@ -283,6 +284,14 @@ int fixAirportName(char *airportName) {
      return 1;
  }
 
+ /**
+  * This method make the current letter in the sentence to be capital letter and
+  * fill the other letters in corrected airport name.
+  * @param token the word to be changed
+  * @param correctedAirportName string to be changed
+  * @param currentIndex index where letter to be changed
+  * @return index to next letter in sentence
+  */
 int upperFirstLetter(const char *token, char *correctedAirportName, int currentIndex) {
     int j;
     for(j = 0; j < strlen(token); j++){
@@ -298,6 +307,14 @@ int upperFirstLetter(const char *token, char *correctedAirportName, int currentI
     return currentIndex;
 }
 
+/**
+ * This method make the current letter in the sentence to be lower-case letter and
+ * fill the other letters in corrected airport name.
+ * @param token the word to be changed
+  * @param correctedAirportName string to be changed
+  * @param currentIndex index where letter to be changed
+  * @return index to next letter in sentence
+ */
 int lowerFirstLetter(const char *token, char *correctedAirportName, int currentIndex) {
     int j;
     for(j = 0; j < strlen(token); j++){
@@ -314,7 +331,7 @@ int lowerFirstLetter(const char *token, char *correctedAirportName, int currentI
 }
 
 /**
- * This method get input by user for airport name
+ * This method get input by user for airport name and make airport name by the condition of the exercise
  */
 void inputAirportName(char * airportName){
     printf("Please Enter Airport name: ");
@@ -324,13 +341,23 @@ void inputAirportName(char * airportName){
     }
 }
 
+/**
+ * This method get input by user for airport country
+ * @param countryName string name to be given
+ */
 void inputAirportCountry(char *countryName){
     printf("Please Enter Airport country: ");
-    gets(countryName); //TODO need to verify ?
+    gets(countryName);
 }
 
+/**
+ * This method get input by user for IATA code
+ * @param airports to be checked if the code already exist
+ * @param airportsSize - number if airport to be checked in
+ * @param IATA code given by user
+ */
 void inputAirportIATA(struct Airport *airports, int airportsSize, char *IATA){
-    printf("Please Enter Airport IATA: ");
+    printf("Please Enter Airport IATA code: ");
     gets(IATA);
     if(IATAValid(NULL,IATA)){
         for(int i=0; i< airportsSize; i++){
@@ -347,6 +374,12 @@ void inputAirportIATA(struct Airport *airports, int airportsSize, char *IATA){
 
 }
 
+/**
+ * This method check if IATA code is valid
+ * @param manager - airport manager to be checked in
+ * @param IATA  - code to be checked
+ * @return 1 - is IATA code is valid, 0 - invalid
+ */
 int IATAValid(struct AirportManager*manager,char *IATA) {
     int IATASize = strlen(IATA);
     if(IATASize == 3){
@@ -364,6 +397,14 @@ int IATAValid(struct AirportManager*manager,char *IATA) {
     return 0;
 }
 
+/**
+ * This method get input by user
+ * @param airports to be checked on
+ * @param airportsSize - number of airports
+ * @param airportName  - airport name input by user
+ * @param countryName  - country name input by user
+ * @param IATA - IATA code input by user
+ */
 void userInput(struct Airport *airports, int airportsSize, char *airportName, char *countryName, char *IATA){
     inputAirportName(airportName);
     inputAirportCountry(countryName);
@@ -403,9 +444,6 @@ int checkDate(char* dateStr,int dd,int mm,int yyyy){
  * This method get departure date from user
  * @param date that given by user
  */
- // TODO - 1. get first string from user
- //        2. do on it strtok with delimiter '/'
- //        3. check if I get 3 tokes in format "dd/mm/yyyy"
 void getDepartureDateFromUser(struct Date *date){
 
     printf("Please Enter Departure Date (format - DD/MM/YYYY) : ");
@@ -427,16 +465,30 @@ void getDepartureDateFromUser(struct Date *date){
      date->year = yyyy;
 }
 
+/**
+ * This method get input by user for airline name
+ * @param airlineName input by user
+ */
 void airlineUserInput(char *airlineName){
     printf("Please Enter Airline Name: ");
     gets(airlineName);
+    printf("\n");
 }
+
+/**
+ * This method free flight memory
+ * @param flight to be freed
+ */
 void freeFlight(struct Flight *flight){
     free(flight->IATALanding);
     free(flight->IATATakeoff);
     free(flight->date);
 }
 
+/**
+ * This method free airline memory
+ * @param airline to be freed
+ */
 void freeAirline(struct Airline* airline) {
     int i;
     for (i=0; i<airline->flightsCounter ; i++) {
@@ -446,6 +498,10 @@ void freeAirline(struct Airline* airline) {
     free(airline);
 }
 
+/**
+ * This method free airport manager memory
+ * @param manager to be freed
+ */
 void freeAirportManager(struct AirportManager *manager){
     int i;
     for(i=0; i<manager->airportsSize; i++){
@@ -455,13 +511,20 @@ void freeAirportManager(struct AirportManager *manager){
     free(manager);
 }
 
+/**
+ * This method free airport memory
+ * @param airport to be freed
+ */
 void freeAirport(struct Airport *airport){
     free(airport->airportName);
     free(airport->countryName);
     free(airport->IATA);
 }
 
-
+/**
+ * This method print airport details
+ * @param airport to be printed
+ */
 void printAirport(struct Airport *airport){
     printf("--------------------------------------------\n");
     printf("Airport Name: %s\n", airport->airportName);
@@ -469,6 +532,11 @@ void printAirport(struct Airport *airport){
     printf("Airport IATA Code: %s\n", airport->IATA);
     printf("--------------------------------------------\n");
 }
+
+/**
+ * This method print airline details
+ * @param airline to be printed
+ */
 void printAirline(struct Airline *airline){
     printf("--------------------------------------------\n");
     printf("Airline Name: %s\n", airline->companyName);
@@ -479,6 +547,11 @@ void printAirline(struct Airline *airline){
     }
     printf("--------------------------------------------\n");
 };
+
+/**
+ * This method print airport manage details
+ * @param manager to be printed
+ */
 void printAirportManager(struct AirportManager* manager){
     printf("============================================\n");
     printf("All Airports in Airport Manager: \n");
@@ -490,7 +563,10 @@ void printAirportManager(struct AirportManager* manager){
 
 }
 
-
+/**
+ * This method print flight details
+ * @param flight to be printed
+ */
 void printFlight(struct Flight *flight){
     printf("--------------------------------------------\n");
     printf("IATA Source Code: %s\n", flight->IATATakeoff);

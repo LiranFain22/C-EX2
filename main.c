@@ -3,7 +3,6 @@
 #include <string.h>
 #include "airportEntities.h"
 
-
 int menu(struct AirportManager *airportManager, struct Airline *airline){
 
     char input[STRING_MAX_SIZE];
@@ -44,6 +43,7 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
             break;
         }
         default:{ //case E
+            printf("Program ending..\n");
             return 0;
         }
 
