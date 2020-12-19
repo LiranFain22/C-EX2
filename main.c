@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "airportEntities.h"
 
 
 int menu(struct AirportManager *airportManager, struct Airline *airline){
 
+    char input[STRING_MAX_SIZE];
     printf("Please Press Character For Proceed:\n"
            "A - adding flight to Airline\n"
            "B - adding airport to airports array\n"
@@ -14,9 +16,12 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
            "E - exit program\n");
 
     char userInput;
-    gets(&userInput);
+    gets(input);
+    if(strlen(input) > 1){
+        //not good TODO
+    }
 
-    // TODO - continue here
+    userInput = input[0];
     switch (userInput) {
         case 'A':{
             addFlight(airportManager,airline);
@@ -27,20 +32,21 @@ int menu(struct AirportManager *airportManager, struct Airline *airline){
             break;
         }
         case 'C':{
-            printAirline(airline);//TODO lemashmesh !!
+            printAirline(airline);
             break;
         }
         case 'D':{
-            printAirportManager(airportManager);//TODO lemashmesh
+            printAirportManager(airportManager);
             break;
         }
         case 'G':{
             printAirlineFlightsLine(airline);
             break;
         }
-        case 'E':{
+        default:{ //case E
             return 0;
         }
+
     }
     return 1;
 }

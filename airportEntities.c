@@ -45,7 +45,6 @@ int IATAIdentical(struct Airport *airport, const char *IATA){
 void addAirport(struct AirportManager *manager){
     char airportName[STRING_MAX_SIZE],airportCountry[STRING_MAX_SIZE],IATA[STRING_MAX_SIZE];
 
-
     userInput(manager->airports, manager->airportsSize,airportName,airportCountry,IATA);
 
     if(manager->airportsSize == 0){
@@ -79,7 +78,7 @@ void addAirport(struct AirportManager *manager){
     }
     strcpy(manager->airports[manager->airportsSize].IATA,IATA);
 
-
+    printf("\nAirport Added Successfully\n\n");
     manager->airportsSize += 1;
 }
 
@@ -120,8 +119,6 @@ int checkReceiveFlightDestination(struct Flight *flight, char *takeoffIATA, char
 }
 
 int checkFlightsLineCount(struct Airline *airline, char *takeoffIATA, char *landingIATA){
-    //TODO ask !!!!
-    //TODO shani changed the signature to struct Airline *airline, and not flights !
     int i;
     int flightsCounter = 0;
     for(i = 0; i < airline->flightsCounter; i++){
@@ -166,8 +163,8 @@ void addFlight(struct AirportManager *manager, struct Airline *airline){
     printf("\nPlease Enter Takeoff Time: ");
     gets(takeoffTime);
     int time = strtol(takeoffTime,NULL,10);
-    while (time>23 || time<0){
-        printf("invalid takeoff time, flease try again\n");
+    while (!isdigit(takeoffTime[0])  || !isdigit(takeoffTime[1]) || time>23 || time<0){
+        printf("invalid takeoff time, please try again\n");
         printf("\nPlease Enter Takeoff Time: ");
         gets(takeoffTime);
         time = strtol(takeoffTime,NULL,10);
@@ -193,15 +190,26 @@ void addFlight(struct AirportManager *manager, struct Airline *airline){
  * @param landingIATA code for check
  */
 void printAirlineFlightsLine(struct Airline *airline){
-    char takeoffIATA[3], landingIATA[3];
+    char takeoffIATA[STRING_MAX_SIZE], landingIATA[STRING_MAX_SIZE];
 
     printf("Please Enter IATA Source Code: ");
     gets(takeoffIATA);
+    while (!IATAValid(NULL,takeoffIATA)){
+        printf("IATA Invalid, please try again\n");
+        printf("Please Enter IATA Source Code: ");
+        gets(takeoffIATA);
+    }
+
     printf("\nPlease Enter IATA Destination Code: ");
     gets(landingIATA);
+    while (!IATAValid(NULL,landingIATA)){
+        printf("IATA Invalid, please try again\n");
+        printf("Please Enter IATA Destination Code: ");
+        gets(landingIATA);
+    }
 
     int flightsCounter = checkFlightsLineCount(airline,takeoffIATA,landingIATA);
-    printf("\nThis Airline Have %d flights in this line", flightsCounter);
+    printf("\nThis Airline Have %d flights in this line\n\n", flightsCounter);
 }
 
 /**
@@ -327,15 +335,13 @@ void inputAirportIATA(struct Airport *airports, int airportsSize, char *IATA){
     if(IATAValid(NULL,IATA)){
         for(int i=0; i< airportsSize; i++){
             if(IATAIdentical(&airports[i],IATA)){
-                printf("IATA already exist, please try again");
-                break;
-            } else {
-                inputAirportIATA(airports,airportsSize, IATA);
+                printf("IATA already exist, please try again\n");
+                inputAirportIATA(airports,airportsSize,IATA);
+                return;
             }
         }
     } else {
         printf("IATA Invalid, please try again\n");
-
         inputAirportIATA(airports,airportsSize, IATA);
     }
 
